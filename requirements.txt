@@ -1,0 +1,6 @@
+pandas
+numpy
+
+termcolor
+setuptools
+pandas_profiling
