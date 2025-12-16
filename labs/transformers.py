@@ -282,21 +282,3 @@ if __name__ == "__main__":
     loss.backward()
     optimizer.step()
     print("Étape d'optimisation effectuée.")
-
-class Transformer(nn.Module):
-    def init(self, **kwargs):
-        super().__init__()
-        # ...
-
-    def forward(self, X):
-        # X: Batch Size x Max seq len
-        X_embeded = self.encoder(X)
-        # X_embeded: (Batch Size, Max seq len x *)
-        X_output = self.decoder(X_embeded)
-        return X_output
-    
-if __name__ == "__main__":
-    model = Transformer()
-    # nn.torch gradient
-    # corss entropy
-
