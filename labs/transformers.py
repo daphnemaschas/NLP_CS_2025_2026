@@ -50,6 +50,8 @@ class MultiHeadAttention(nn.Module):
         # 4. Concaténation et Couche de Sortie
         output = output.transpose(1, 2).contiguous().view(output.size(0), -1, self.d_model)
         output = self.out(output)
+
+        # Le calcul est en O(Seq Len ** 2): on comprend l'intérêt des window size qu'il faut calculer au training
         return output
 
 class PositionalEncoding(nn.Module): # Embedding Statique
