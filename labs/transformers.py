@@ -22,12 +22,21 @@ class MultiHeadAttention(nn.Module):
 
     def forward(self, q, k, v, mask=None):
         # 1. Couches linéaires et redimensionnement pour les têtes
-        q = self.q_linear(q).view(q.size(0), -1, self.num_heads, self.d_k).transpose(1, 2)
-        k = self.k_linear(k).view(k.size(0), -1, self.num_heads, self.d_k).transpose(1, 2)
-        v = self.v_linear(v).view(v.size(0), -1, self.num_heads, self.d_k).transpose(1, 2)
-
+        q = self.q_linear(q).view(q.size(0), -1, self.num_heads, self.d_k).transpose(1, 2) # Shape: Batch Size, Seq Length, d_model et Avant le transpose: Batch Size, Seq Length, num_heads, d_model
+        k = self.k_linear(k).view(k.size(0), -1, self.num_heads, self.d_k).transpose(1, 2) # Shape: Batch Size, Seq Length, d_model et Avant le transpose: Batch Size, Seq Length, num_heads, d_model
+        v = self.v_linear(v).view(v.size(0), -1, self.num_heads, self.d_k).transpose(1, 2) # Shape: Batch Size, Seq Length, d_model et Avant le transpose: Batch Size, Seq Length, num_heads, d_model
+        # C'est équivalent à faire: 
+        # Mais reshape peut rendre le code plus court (en supprimant le besoin de .contiguous() après un transpose), 
+        # mais elle masque la création potentielle d'une copie de données. 
+        # Dans un code critique pour la performance comme le Transformer, 
+        # beaucoup de développeurs préfèrent l'approche explicite de .view() et .contiguous() 
+        # pour garder le contrôle sur les allocations de mémoire.
+        # q = self.q_linear(q).reshape(q.size(0), -1, self.num_heads, self.d_k).transpose(1, 2) 
+        # k = self.k_linear(k).reshape(k.size(0), -1, self.num_heads, self.d_k).transpose(1, 2) 
+        # v = self.v_linear(v).reshape(v.size(0), -1, self.num_heads, self.d_k).transpose(1, 2)
+        
         # 2. Calcul de l'Attention (Scaled Dot-Product Attention)
-        scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
+        scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k) # Shape: Seq Length, Seq Length
 
         # Application du masque (pour le Décodeur)
         if mask is not None:
