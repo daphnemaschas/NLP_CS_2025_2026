@@ -72,6 +72,30 @@ class FeedForward(nn.Module):
 
     def forward(self, x):
         return self.w_2(self.dropout(F.relu(self.w_1(x))))
+    
+class LayerNorm(nn.Module):
+    """Implémentation manuelle de la Layer Normalization (appliquée sur la dernière dimension)"""
+    def __init__(self, features, eps=1e-6):
+        super().__init__()
+        # Paramètres apprenables gamma (gain) et beta (biais/décalage)
+        self.a_2 = nn.Parameter(torch.ones(features))  # gamma (initialisé à 1)
+        self.b_2 = nn.Parameter(torch.zeros(features)) # beta (initialisé à 0)
+        self.eps = eps
+
+    def forward(self, x):
+        # x: (Batch Size, Seq Length, d_model)
+        
+        # 1. Calcul de la moyenne et de la variance sur la dernière dimension (d_model)
+        # La moyenne est calculée sur la dimension des features (-1)
+        mean = x.mean(dim=-1, keepdim=True)
+        std = x.std(dim=-1, keepdim=True) # std = sqrt(variance)
+
+        # 2. Normalisation (Standardisation)
+        x = (x - mean) / (std + self.eps)
+
+        # 3. Mise à l'échelle et décalage (apprentissage)
+        # Multiplication par gamma (a_2) et ajout de beta (b_2)
+        return self.a_2 * x + self.b_2
 
 # --- 2. Blocs Encodeur et Décodeur (avec Normalisation) ---
 
@@ -79,8 +103,8 @@ class EncoderLayer(nn.Module):
     """Représente un seul bloc de l'Encodeur"""
     def __init__(self, d_model, num_heads, d_ff, dropout=0.1):
         super().__init__()
-        self.norm1 = nn.LayerNorm(d_model)
-        self.norm2 = nn.LayerNorm(d_model)
+        self.norm1 = LayerNorm(d_model)
+        self.norm2 = LayerNorm(d_model)
         self.attn = MultiHeadAttention(d_model, num_heads)
         self.ffn = FeedForward(d_model, d_ff, dropout)
         self.dropout1 = nn.Dropout(dropout)
@@ -102,9 +126,9 @@ class DecoderLayer(nn.Module):
     """Représente un seul bloc du Décodeur"""
     def __init__(self, d_model, num_heads, d_ff, dropout=0.1):
         super().__init__()
-        self.norm1 = nn.LayerNorm(d_model)
-        self.norm2 = nn.LayerNorm(d_model)
-        self.norm3 = nn.LayerNorm(d_model)
+        self.norm1 = LayerNorm(d_model)
+        self.norm2 = LayerNorm(d_model)
+        self.norm3 = LayerNorm(d_model)
         self.attn1 = MultiHeadAttention(d_model, num_heads) # Masked Self-Attention
         self.attn2 = MultiHeadAttention(d_model, num_heads) # Encoder-Decoder Attention
         self.ffn = FeedForward(d_model, d_ff, dropout)
