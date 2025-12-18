@@ -1,6 +1,6 @@
 # Cours de NLP
 
-Cours de **Traitement Automatique du Langage Naturel (NLP)** de CentraleSupélec. Ce repository comprends les labs, les cours en format pdf et mes notes pour l'implémentations du transformers danzs labs. Pour mettre en application les concepts vu dans ce cours, j'implémente manuellement LSTM, Transformer Vanilla et BERT dans le projet Annalyse-Sentiment.
+Cours de **Traitement Automatique du Langage Naturel (NLP)** de CentraleSupélec. Ce repository comprends les labs, les cours en format pdf et mes notes pour l'implémentations du transformers danzs labs. Pour mettre en application les concepts vu dans ce cours, j'implémente manuellement LSTM, Transformer Vanilla et BERT dans le projet Analyse-Sentiment.
 
 ## 1. Équipe pédagogique
 
